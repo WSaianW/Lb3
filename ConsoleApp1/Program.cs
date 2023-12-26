@@ -141,9 +141,15 @@ class RPNCalculator
 
         return string.Join(" ", output);
     }
-
+    
     public void ProcessExpression(string infixExpression)
     {
+        if (HasRedundantParentheses(infixExpression))
+        {
+            Console.WriteLine("Error: Redundant parentheses detected. Please fix the expression.");
+            return;
+        }
+
         var postfixExpression = InfixToPostfix(infixExpression);
         Console.WriteLine($"Postfix expression: {postfixExpression}");
 
@@ -151,10 +157,57 @@ class RPNCalculator
         Console.WriteLine($"Result: {result}");
     }
 
+    private bool HasRedundantParentheses(string infixExpression)
+    {
+        int openingParentheses = 0;
+        int closingParentheses = 0;
+
+        foreach (char character in infixExpression)
+        {
+            if (character == '(')
+            {
+                openingParentheses++;
+            }
+            else if (character == ')')
+            {
+                closingParentheses++;
+            }
+        }
+
+        return openingParentheses != closingParentheses;
+    }
     public static void Main()
     {
+        
         var calculator = new RPNCalculator();
-        var infixExpression = "( 3 + 5 ) * sqr ( 2 ) - abs ( -10 ) + 11 % 2";
-        calculator.ProcessExpression(infixExpression);
+
+        do
+        {
+            Console.Write("Enter an infix expression (or enter 2 to quit, 1 to continue): ");
+            string userInput = Console.ReadLine();
+
+            if (userInput == "2")
+            {
+                break;
+            }
+            else if (userInput == "1")
+            {
+                Console.Write("Enter the infix expression: ");
+                string infixExpression = Console.ReadLine();
+
+                if (calculator.HasRedundantParentheses(infixExpression))
+                {
+                    Console.WriteLine("Error: Redundant parentheses detected. Please fix the expression.");
+                    continue;
+                }
+
+                calculator.ProcessExpression(infixExpression);
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter 1 to continue or 2 to quit.");
+            }
+
+        } while (true);
     }
 }
